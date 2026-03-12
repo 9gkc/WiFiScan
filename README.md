@@ -1,56 +1,31 @@
-# Wi-Fi Security Checker (مدقق أمان شبكات Wi-Fi)
+# Wi-Fi Security Checker
 
-## نظرة عامة
+## Overview
 
-هذه الأداة هي سكريبت بايثون بسيط وفعال يستخدم مكتبة `Scapy` لفحص شبكات Wi-Fi المحيطة وتحديد معلوماتها الأساسية، بما في ذلك نوع التشفير المستخدم. تم تصميم الأداة لمساعدة طلاب الأمن السيبراني والمهتمين بالأمن على فهم أنواع التشفير المختلفة ونقاط قوتها وضعفها، بالإضافة إلى تعزيز الوعي الأمني حول أهمية تأمين الشبكات اللاسلكية.
+This tool is a simple yet effective Python script that utilizes the `Scapy` library to scan nearby Wi-Fi networks and identify their essential information, including the encryption type used. The tool is designed to help cybersecurity students and security enthusiasts understand different encryption types, their strengths and weaknesses, and to raise security awareness about the importance of securing wireless networks.
 
-## الميزات
+## Features
 
-*   **فحص شبكات Wi-Fi:** يكتشف نقاط الوصول اللاسلكية (Access Points) القريبة.
-*   **عرض معلومات الشبكة:** يعرض معرف الشبكة (SSID)، عنوان MAC (BSSID)، القناة، وقوة الإشارة (dBm).
-*   **تحديد نوع التشفير:** يحلل ويحدد نوع التشفير المستخدم لكل شبكة (مثل WPA3، WPA2/PSK، WPA/PSK، WEP، أو شبكات مفتوحة).
-*   **وضع المراقبة (Monitor Mode):** يتطلب تشغيل واجهة الشبكة اللاسلكية في وضع المراقبة لالتقاط حزم البيانات.
-*   **تغيير القنوات تلقائياً:** يقوم بالتبديل بين قنوات Wi-Fi المختلفة لضمان اكتشاف أوسع للشبكات.
+*   **Wi-Fi Network Scanning:** Discovers nearby wireless Access Points.
+*   **Network Information Display:** Shows the Network ID (SSID), MAC address (BSSID), Channel, and Signal Strength (dBm).
+*   **Encryption Type Identification:** Analyzes and identifies the encryption type used for each network (e.g., WPA3, WPA2/PSK, WPA/PSK, WEP, or Open networks).
+*   **Monitor Mode Requirement:** Requires the wireless network interface to be in monitor mode to capture data packets.
+*   **Automatic Channel Hopping:** Automatically switches between different Wi-Fi channels to ensure broader network discovery.
 
-## المتطلبات
+## Requirements
 
-*   **نظام تشغيل مبني على Unix:** مثل Kali Linux أو Ubuntu (موصى به).
+*   **Unix-based OS:** Such as Kali Linux or Ubuntu (recommended).
 *   **Python 3.x**
-*   **مكتبة Scapy:** مكتبة قوية لمعالجة حزم الشبكة.
-*   **مكتبة Pandas:** تستخدم لعرض البيانات بشكل منظم.
-*   **أدوات `iwconfig` و `ifconfig`:** لإدارة واجهة الشبكة اللاسلكية ووضع المراقبة.
-*   **صلاحيات الجذر (Root Privileges):** لتشغيل السكريبت وتغيير وضع واجهة الشبكة.
+*   **Scapy Library:** A powerful library for network packet manipulation.
+*   **Pandas Library:** Used for organized data display.
+*   **`iwconfig` and `ifconfig` tools:** For managing the wireless network interface and monitor mode.
+*   **Root Privileges:** Required to run the script and change the network interface mode.
 
-## التثبيت
+## How to Use
 
-1.  **استنساخ المستودع (Clone the repository):**
+1.  **Set Wireless Interface to Monitor Mode:**
 
-    ```bash
-    git clone https://github.com/YOUR_USERNAME/wifi-security-checker.git
-    cd wifi-security-checker
-    ```
-
-    *(ملاحظة: ستحتاج إلى استبدال `YOUR_USERNAME` باسم المستخدم الخاص بك على GitHub بعد إنشاء المستودع.)*
-
-2.  **تثبيت المكتبات المطلوبة:**
-
-    ```bash
-    pip3 install scapy pandas
-    ```
-
-3.  **تثبيت `aircrack-ng` (إذا لم يكن مثبتاً):**
-
-    ```bash
-    sudo apt-get update
-    sudo apt-get install aircrack-ng
-    ```
-    هذه الحزمة توفر الأدوات اللازمة لوضع واجهة الشبكة في وضع المراقبة.
-
-## كيفية الاستخدام
-
-1.  **وضع واجهة الشبكة في وضع المراقبة:**
-
-    قبل تشغيل السكريبت، يجب وضع واجهة الشبكة اللاسلكية في وضع المراقبة. استبدل `wlan0` باسم واجهتك اللاسلكية (يمكنك معرفتها باستخدام `iwconfig`):
+    Before running the script, you must put your wireless network interface into monitor mode. Replace `wlan0` with your wireless interface name (you can find it using `iwconfig`):
 
     ```bash
     sudo ifconfig wlan0 down
@@ -58,38 +33,38 @@
     sudo ifconfig wlan0 up
     ```
 
-    *(ملاحظة: قد تحتاج إلى تغيير `wlan0` إلى `wlan0mon` أو اسم آخر حسب نظامك.)*
+    *(Note: You might need to change `wlan0` to `wlan0mon` or another name depending on your system.)*
 
-2.  **تشغيل الأداة:**
+2.  **Run the Tool:**
 
-    قم بتشغيل السكريبت بصلاحيات الجذر:
+    Execute the script with root privileges:
 
     ```bash
     sudo python3 wifi_security_checker.py
     ```
 
-    ستبدأ الأداة في فحص الشبكات وعرضها في جدول محدث باستمرار. اضغط `Ctrl+C` لإيقاف الفحص.
+    The tool will start scanning for networks and display them in a continuously updated table. Press `Ctrl+C` to stop the scan.
 
-## تحليل أنواع التشفير
+## Encryption Type Analysis
 
-تساعدك الأداة على تحديد نوع التشفير لكل شبكة، مما يسمح لك بتقييم مستوى أمانها:
+This tool helps you identify the encryption type for each network, allowing you to assess its security level:
 
-| نوع التشفير | الوصف | مستوى الأمان | ملاحظات |
-| :---------- | :---- | :------------ | :------- |
-| **Open (No Encryption)** | لا يوجد تشفير على الإطلاق. البيانات تُرسل كنص عادي. | **ضعيف جداً** | يجب تجنب الاتصال بهذه الشبكات للبيانات الحساسة. |
-| **WEP** | (Wired Equivalent Privacy) بروتوكول قديم وضعيف جداً، سهل الاختراق. | **ضعيف جداً** | لا ينصح باستخدامه أبداً. |
-| **WPA/PSK** | (Wi-Fi Protected Access / Pre-Shared Key) تحسين لـ WEP، لكنه لا يزال عرضة لبعض الهجمات. | **متوسط** | أفضل من WEP، لكن WPA2/WPA3 أفضل بكثير. |
-| **WPA2/PSK** | (Wi-Fi Protected Access II / Pre-Shared Key) المعيار الأكثر شيوعاً، يوفر تشفيراً قوياً (AES). | **جيد** | آمن لمعظم الاستخدامات المنزلية والتجارية الصغيرة. |
-| **WPA3** | (Wi-Fi Protected Access III) أحدث وأقوى معيار للتشفير، يوفر حماية معززة ضد هجمات القوة الغاشمة (Brute-Force). | **ممتاز** | موصى به بشدة إذا كان جهاز الراوتر يدعمه. |
+| Encryption Type | Description | Security Level | Notes |
+| :-------------- | :---------- | :------------- | :---- |
+| **Open (No Encryption)** | No encryption at all. Data is transmitted in plain text. | **Very Weak** | Avoid connecting to these networks for sensitive data. |
+| **WEP** | (Wired Equivalent Privacy) An old and very weak protocol, easily crackable. | **Very Weak** | Never recommended for use. |
+| **WPA/PSK** | (Wi-Fi Protected Access / Pre-Shared Key) An improvement over WEP, but still vulnerable to some attacks. | **Medium** | Better than WEP, but WPA2/WPA3 are significantly better. |
+| **WPA2/PSK** | (Wi-Fi Protected Access II / Pre-Shared Key) The most common standard, provides strong encryption (AES). | **Good** | Secure for most home and small business uses. |
+| **WPA3** | (Wi-Fi Protected Access III) The latest and strongest encryption standard, offering enhanced protection against brute-force attacks. | **Excellent** | Highly recommended if your router supports it. |
 
-## المساهمة
+## Contribution
 
-نرحب بالمساهمات لتحسين هذه الأداة! إذا كان لديك أي اقتراحات أو تحسينات، فلا تتردد في فتح مشكلة (Issue) أو إرسال طلب سحب (Pull Request).
+Contributions to improve this tool are welcome! If you have any suggestions or enhancements, feel free to open an issue or submit a pull request.
 
-## الترخيص
+## License
 
-هذا المشروع مرخص بموجب ترخيص MIT. انظر ملف `LICENSE` لمزيد من التفاصيل.
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
-## إخلاء مسؤولية
+## Disclaimer
 
-هذه الأداة مخصصة للأغراض التعليمية والبحثية فقط. استخدامها لأي أنشطة غير قانونية أو ضارة يقع على مسؤولية المستخدم وحده. المؤلف لا يتحمل أي مسؤولية عن أي سوء استخدام لهذه الأداة.
+This tool is intended for educational and research purposes only. Its use for any illegal or harmful activities is solely at the user's own risk. The author is not responsible for any misuse of this tool.

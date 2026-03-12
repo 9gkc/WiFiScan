@@ -6,17 +6,17 @@ import pandas
 import time
 import os
 
-# إعداد واجهة الشبكة لوضع المراقبة (Monitor Mode)
-# يجب تشغيل هذا الجزء يدوياً قبل تشغيل السكريبت أو تضمينه في السكريبت مع صلاحيات الجذر
+# Set up the network interface for monitor mode
+# This part needs to be run manually before the script or included in the script with root privileges
 # sudo ifconfig wlan0 down
 # sudo iwconfig wlan0 mode monitor
 # sudo ifconfig wlan0 up
 
-# اسم الواجهة اللاسلكية (قد تحتاج إلى تغييرها إلى wlan0mon أو ما شابه)
+# Wireless interface name (you might need to change it to wlan0mon or similar)
 interface = "wlan0mon"
 
-# DataFrame لتخزين معلومات الشبكات
-networks = pandas.DataFrame(columns=["BSSID", "SSID", "Channel", "Signal (dBm)", "Encryption"]) # إضافة عمود التشفير
+# DataFrame to store network information
+networks = pandas.DataFrame(columns=["BSSID", "SSID", "Channel", "Signal (dBm)", "Encryption"]) # Add Encryption column
 networks.set_index("BSSID", inplace=True)
 
 def callback(packet):
@@ -33,7 +33,7 @@ def callback(packet):
         channel = stats.get("channel")
         crypto = stats.get("crypto")
 
-        # تحليل نوع التشفير بشكل أكثر تفصيلاً
+        # More detailed encryption type analysis
         encryption_type = "Unknown"
         if crypto:
             if "WPA3" in crypto:
@@ -47,7 +47,7 @@ def callback(packet):
             elif "OPN" in crypto or "None" in crypto:
                 encryption_type = "Open (No Encryption)"
             else:
-                encryption_type = ", ".join(crypto) # لعرض جميع أنواع التشفير المكتشفة
+                encryption_type = ", ".join(crypto) # Display all detected encryption types
 
         networks.loc[bssid] = (ssid, channel, dbm_signal, encryption_type)
 
@@ -55,7 +55,7 @@ def change_channel():
     ch = 1
     while True:
         os.system(f"iwconfig {interface} channel {ch}")
-        # التبديل بين القنوات من 1 إلى 14 كل 0.5 ثانية
+        # Switch between channels 1 to 14 every 0.5 seconds
         ch = ch % 14 + 1
         time.sleep(0.5)
 
@@ -64,40 +64,40 @@ def print_networks():
         os.system("clear")
         print("\n[*] Scanning for Wi-Fi Networks...")
         print(networks)
-        time.sleep(1) # تحديث الشاشة كل ثانية
+        time.sleep(1) # Update screen every second
 
 if __name__ == "__main__":
-    # التأكد من أن المستخدم لديه صلاحيات الجذر
+    # Ensure the user has root privileges
     if os.geteuid() != 0:
-        print("يرجى تشغيل السكريبت بصلاحيات الجذر (sudo python3 wifi_security_checker.py)")
+        print("Please run the script with root privileges (sudo python3 wifi_security_checker.py)")
         exit(1)
 
-    print("\n[!] يرجى التأكد من أن واجهة الشبكة اللاسلكية (مثل wlan0) في وضع المراقبة (Monitor Mode).")
-    print(f"[!] الواجهة المستخدمة: {interface}")
-    print("[!] يمكنك استخدام الأوامر التالية لضبط وضع المراقبة (استبدل wlan0 باسم واجهتك):")
+    print("\n[!] Please ensure your wireless network interface (e.g., wlan0) is in Monitor Mode.")
+    print(f"[!] Interface used: {interface}")
+    print("[!] You can use the following commands to set monitor mode (replace wlan0 with your interface name):")
     print("    sudo ifconfig wlan0 down")
     print("    sudo iwconfig wlan0 mode monitor")
     print("    sudo ifconfig wlan0 up")
-    print("\n[!] اضغط Ctrl+C لإيقاف الفحص.")
+    print("\n[!] Press Ctrl+C to stop scanning.")
     time.sleep(5)
 
-    # بدء تبديل القنوات في خلفية منفصلة
+    # Start channel hopping in a separate thread
     channel_changer = Thread(target=change_channel)
     channel_changer.daemon = True
     channel_changer.start()
 
-    # بدء عرض الشبكات في خلفية منفصلة
+    # Start displaying networks in a separate thread
     network_printer = Thread(target=print_networks)
     network_printer.daemon = True
     network_printer.start()
 
-    # بدء عملية الشم (sniffing)
+    # Start sniffing process
     try:
         sniff(prn=callback, iface=interface, store=False)
     except KeyboardInterrupt:
-        print("\n[*] تم إيقاف الفحص.")
+        print("\n[*] Scanning stopped.")
     except Exception as e:
-        print(f"\n[!] حدث خطأ: {e}")
+        print(f"\n[!] An error occurred: {e}")
     finally:
-        # يمكنك إضافة كود لإعادة الواجهة إلى الوضع المدار (Managed Mode) هنا
-        print("[*] انتهى البرنامج.")
+        # You can add code here to revert the interface to Managed Mode
+        print("[*] Program finished.")
