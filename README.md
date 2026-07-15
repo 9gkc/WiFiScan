@@ -1,5 +1,14 @@
 # Wi-Fi Security Checker
 
+<div align="center">
+  <img src="https://img.shields.io/badge/Language-Python-blue?style=for-the-badge&logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License MIT">
+  <img src="https://img.shields.io/github/last-commit/9gkc/WiFiScan?style=for-the-badge&label=Last%20Update&color=58A6FF" alt="Last Update">
+  <img src="https://img.shields.io/github/stars/9gkc/WiFiScan?style=for-the-badge&color=58A6FF" alt="GitHub Stars">
+  <img src="https://img.shields.io/github/forks/9gkc/WiFiScan?style=for-the-badge&color=58A6FF" alt="GitHub Forks">
+</div>
+
+
 ## Overview
 
 This tool is a simple yet effective Python script that utilizes the `Scapy` library to scan nearby Wi-Fi networks and identify their essential information, including the encryption type used. The tool is designed to help cybersecurity students and security enthusiasts understand different encryption types, their strengths and weaknesses, and to raise security awareness about the importance of securing wireless networks.
