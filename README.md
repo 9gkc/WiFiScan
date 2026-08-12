@@ -18,17 +18,23 @@ This tool is a simple yet effective Python script that utilizes the `Scapy` libr
 *   **Wi-Fi Network Scanning:** Discovers nearby wireless Access Points.
 *   **Network Information Display:** Shows the Network ID (SSID), MAC address (BSSID), Channel, and Signal Strength (dBm).
 *   **Encryption Type Identification:** Analyzes and identifies the encryption type used for each network (e.g., WPA3, WPA2/PSK, WPA/PSK, WEP, or Open networks).
-*   **Monitor Mode Requirement:** Requires the wireless network interface to be in monitor mode to capture data packets.
-*   **Automatic Channel Hopping:** Automatically switches between different Wi-Fi channels to ensure broader network discovery.
+*   **Monitor Mode Requirement:** Requires the wireless network interface to be placed in monitor mode separately before capture.
+*   **Automatic Channel Hopping:** Switches between selected channels without invoking a shell.
+*   **Defensive Scope:** Observes beacon frames only; it does not deauthenticate clients, inject traffic, crack credentials, or change interface mode.
 
 ## Requirements
 
 *   **Unix-based OS:** Such as Kali Linux or Ubuntu (recommended).
 *   **Python 3.x**
-*   **Scapy Library:** A powerful library for network packet manipulation.
-*   **Pandas Library:** Used for organized data display.
-*   **`iwconfig` and `ifconfig` tools:** For managing the wireless network interface and monitor mode.
-*   **Root Privileges:** Required to run the script and change the network interface mode.
+*   **Scapy Library:** Used for passive beacon capture.
+*   **`iwconfig` tool:** Optional; used only for channel hopping when available.
+*   **Root Privileges:** Required by the operating system for monitor-mode packet capture.
+
+Install the Python dependency with:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
 
 ## How to Use
 
@@ -49,10 +55,10 @@ This tool is a simple yet effective Python script that utilizes the `Scapy` libr
     Execute the script with root privileges:
 
     ```bash
-    sudo python3 wifi_security_checker.py
-    ```
+    sudo python3 wifi_security_checker.py --interface wlan0mon --channels 1,6,11
+```
 
-    The tool will start scanning for networks and display them in a continuously updated table. Press `Ctrl+C` to stop the scan.
+The interface must already be in monitor mode. The tool will display beacon networks in a continuously updated table. Press `Ctrl+C` to stop the scan. You can tune the refresh and hopping intervals with `--refresh-interval` and `--channel-interval`. The tool validates that the interface exists and never changes monitor mode automatically.
 
 ## Encryption Type Analysis
 
@@ -76,4 +82,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 ## Disclaimer
 
-This tool is intended for educational and research purposes only. Its use for any illegal or harmful activities is solely at the user's own risk. The author is not responsible for any misuse of this tool.
+This tool is intended for educational and defensive research on networks you own or are explicitly authorized to assess. It observes public beacon frames only and must not be used for disruption, credential capture, unauthorized access, or traffic injection. The author is not responsible for misuse.
