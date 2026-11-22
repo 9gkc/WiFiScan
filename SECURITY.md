@@ -1,11 +1,20 @@
 # Security Policy
 
-## Supported versions
+## Supported Version
 
 The default branch is the supported version for security fixes.
 
-## Reporting a vulnerability
+## Responsible Use
 
-Please do not disclose a suspected vulnerability in a public issue. Use GitHub's private vulnerability reporting feature from the repository Security tab when it is available. If private reporting is unavailable, contact the repository owner through the GitHub profile at https://github.com/9gkc and include reproducible steps, impact, and a safe way to follow up.
+WiFiScan is a **defensive** utility intended for inspecting Wi-Fi security and encryption information on networks you own or have explicit permission to assess. It must not be used for unauthorized network monitoring or attacks.
 
-Please avoid including credentials, API keys, personal data, or destructive proof-of-concept payloads in a report. Security reports are reviewed in good faith and handled as quickly as practical.
+## Reporting a Vulnerability
+
+Please do not disclose a suspected vulnerability in a public issue.
+
+1. Prefer GitHub's private vulnerability reporting feature when available.
+2. Otherwise contact the repository owner through the GitHub profile at https://github.com/9gkc.
+
+Include reproducible steps, impact, and a safe way to follow up. Do not include credentials or destructive proof-of-concept payloads.
+
+Reports are reviewed in good faith and handled as quickly as practical.
