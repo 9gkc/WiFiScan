@@ -14,6 +14,7 @@ import socket
 import subprocess
 import sys
 import time
+from collections import Counter
 from dataclasses import dataclass
 from threading import Event, Lock, Thread
 from typing import Any, Iterable
@@ -48,6 +49,10 @@ class NetworkStore:
         with self._lock:
             return sorted(self._records.values(), key=lambda item: (item.ssid.casefold(), item.bssid))
 
+    def encryption_summary(self) -> dict[str, int]:
+        with self._lock:
+            return dict(Counter(record.encryption for record in self._records.values()))
+
 
 def decode_ssid(value: Any) -> str:
     """Decode an SSID without allowing malformed bytes to stop the sniffer."""
@@ -68,16 +73,21 @@ def format_signal(packet: Any) -> str:
 
 def classify_encryption(crypto: Iterable[Any] | None) -> str:
     values = {str(value).upper() for value in (crypto or set())}
+
     if "WPA3" in values or any("SAE" in value for value in values):
         return "WPA3"
-    if "WPA2" in values and "PSK" in values:
-        return "WPA2/PSK"
+    if "WPA2" in values and ("PSK" in values or "ENTERPRISE" in values or "802.1X" in values):
+        if "PSK" in values:
+            return "WPA2-PSK"
+        return "WPA2-Enterprise"
     if "WPA" in values and "PSK" in values:
-        return "WPA/PSK"
+        return "WPA-PSK"
     if "WEP" in values:
-        return "WEP"
-    if "OPN" in values or "NONE" in values or not values:
-        return "Open (No Encryption)" if "OPN" in values or "NONE" in values else "Unknown"
+        return "WEP (Insecure)"
+    if "OPN" in values or "NONE" in values:
+        return "Open (No Encryption)"
+    if not values:
+        return "Unknown"
     return ", ".join(sorted(values))
 
 
@@ -159,6 +169,17 @@ def print_networks(store: NetworkStore, stop_event: Event, interval: float) -> N
         else:
             print("No beacon networks observed yet.")
         stop_event.wait(interval)
+
+
+def print_summary(store: NetworkStore) -> None:
+    records = store.snapshot()
+    summary = store.encryption_summary()
+    print("\n[*] Scan summary")
+    print(f"    Networks observed: {len(records)}")
+    if summary:
+        print("    Encryption breakdown:")
+        for name, count in sorted(summary.items(), key=lambda item: (-item[1], item[0])):
+            print(f"      - {name}: {count}")
 
 
 def parse_channels(value: str) -> tuple[int, ...]:
@@ -246,7 +267,8 @@ def main(argv: list[str] | None = None) -> int:
         stop_event.set()
         channel_thread.join(timeout=2)
         display_thread.join(timeout=2)
-        print("\n[*] Scanning stopped.")
+        print_summary(store)
+        print("[*] Scanning stopped.")
 
     return 0
 
