@@ -7,15 +7,17 @@ crack credentials, inject traffic, or change the interface mode automatically.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import signal
 import socket
 import subprocess
 import sys
-import time
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+from pathlib import Path
 from threading import Event, Lock, Thread
 from typing import Any, Iterable
 
@@ -174,12 +176,28 @@ def print_networks(store: NetworkStore, stop_event: Event, interval: float) -> N
 def print_summary(store: NetworkStore) -> None:
     records = store.snapshot()
     summary = store.encryption_summary()
+    open_count = sum(1 for item in records if "Open" in item.encryption or "WEP" in item.encryption)
     print("\n[*] Scan summary")
     print(f"    Networks observed: {len(records)}")
+    print(f"    Weak/open (Open or WEP): {open_count}")
     if summary:
         print("    Encryption breakdown:")
         for name, count in sorted(summary.items(), key=lambda item: (-item[1], item[0])):
             print(f"      - {name}: {count}")
+
+
+def write_json_summary(store: NetworkStore, path: Path) -> None:
+    records = store.snapshot()
+    payload = {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "tool": "WiFiScan",
+        "scope": "Passive beacon observation only",
+        "networks_observed": len(records),
+        "encryption_summary": store.encryption_summary(),
+        "networks": [asdict(record) for record in records],
+    }
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"[*] JSON summary written to {path}")
 
 
 def parse_channels(value: str) -> tuple[int, ...]:
@@ -203,6 +221,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--channels", type=parse_channels, default=DEFAULT_CHANNELS, help="Channels, e.g. 1,6,11.")
     parser.add_argument("--channel-interval", type=float, default=0.5, help="Seconds between channel changes.")
     parser.add_argument("--refresh-interval", type=float, default=1.0, help="Seconds between table refreshes.")
+    parser.add_argument(
+        "--json-out",
+        type=Path,
+        default=None,
+        help="Optional path to write a JSON summary when the scan stops.",
+    )
     return parser
 
 
@@ -268,6 +292,11 @@ def main(argv: list[str] | None = None) -> int:
         channel_thread.join(timeout=2)
         display_thread.join(timeout=2)
         print_summary(store)
+        if args.json_out is not None:
+            try:
+                write_json_summary(store, args.json_out)
+            except OSError as error:
+                print(f"[!] Could not write JSON summary: {error}", file=sys.stderr)
         print("[*] Scanning stopped.")
 
     return 0
